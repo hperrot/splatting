@@ -7,5 +7,6 @@ bin/*
 
 *.egg-info
 
+__pycache__
 *.so
 *.pyc
