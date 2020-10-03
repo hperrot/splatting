@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/hperrot/miniconda3/envs/splatting/lib/python3.8/site-packages/torch/include",
+                "/home/hperrot/miniconda3/envs/splatting/lib/python3.8/site-packages/torch/include/torch/csrc/api/include",
+                "/home/hperrot/miniconda3/envs/splatting/lib/python3.8/site-packages/torch/include/TH",
+                "/home/hperrot/miniconda3/envs/splatting/lib/python3.8/site-packages/torch/include/THC"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu18",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}
