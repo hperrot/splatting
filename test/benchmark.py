@@ -20,7 +20,7 @@ def run_test(batch_size, spatial_size, flow_init):
 
 def benchmark():
     for batch_size in [1, 2, 4]:
-        for spatial_size in [2, 8, 16]:
+        for spatial_size in [2, 8, 16, 256, 1024]:
             for flow_init in ["zeros", "ones"]:
                 run_test(batch_size, spatial_size, flow_init)
 

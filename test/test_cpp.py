@@ -1,5 +1,6 @@
 import torch
 import cpp.splatting_cpp
+import pytest
 
 
 def test_zero_flow():
@@ -78,3 +79,24 @@ def test_out_of_bounds():
     target = torch.zeros(1, 1, 3, 3)
     output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
     assert(torch.equal(output, target))
+
+def dispatch_fail(dtype):
+    frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
+    flow = torch.zeros(1, 1, 3, 3, dtype=dtype)
+    with pytest.raises(RuntimeError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+def dispatch_not_fail(dtype):
+    frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
+    flow = torch.zeros(1, 1, 3, 3, dtype=dtype)
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+def test_dispatch_fail_and_not_fail():
+    dispatch_fail(torch.int)
+    dispatch_fail(torch.int8)
+    dispatch_fail(torch.int16)
+    dispatch_fail(torch.int32)
+    dispatch_fail(torch.int64)
+    dispatch_fail(torch.float16)
+    dispatch_not_fail(torch.float32)
+    dispatch_not_fail(torch.float64)
