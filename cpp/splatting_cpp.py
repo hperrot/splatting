@@ -18,6 +18,12 @@ class SplattingFunction(torch.autograd.Function):
         output = splatting_cpp.splatting_forward(frame, flow)
         return output
 
+    @staticmethod
+    def backward(ctx, grad_output):
+        frame, flow = ctx.saved_tensors
+        grad_frame, grad_flow = splatting_cpp.splatting_backward(frame, flow, grad_output)
+        return grad_frame, grad_flow
+
 
 class Splatting(torch.nn.Module):
     def __init__(self):
