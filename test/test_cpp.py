@@ -128,3 +128,41 @@ def test_direction_3_not_contiguous():
     target[0, :, 0, 1] = 1
     output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
     assert(torch.equal(output, target))
+
+def test_wrong_dimensions():
+    # len(frame.size()) != 4
+    frame = torch.zeros(1)
+    flow = torch.zeros(1, 2, 3, 3)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+    # len(flow.size()) != 4
+    frame = torch.zeros(1, 1, 3, 3)
+    flow = torch.zeros(1)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+    # frame.size()[0] != flow.size()[0]
+    frame = torch.zeros(1, 1, 3, 3)
+    flow = torch.zeros(2, 2, 3, 3)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+    # frame.size()[2] != flow.size()[2]
+    frame = torch.zeros(1, 1, 3, 3)
+    flow = torch.zeros(1, 2, 2, 3)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+    # frame.size()[3] != flow.size()[3]
+    frame = torch.zeros(1, 1, 3, 3)
+    flow = torch.zeros(1, 2, 3, 2)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
+    # flow.size()[1] != 2
+    frame = torch.zeros(1, 1, 3, 3)
+    flow = torch.zeros(1, 1, 3, 3)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    
