@@ -144,7 +144,7 @@ void splatting_forward(
         frame.scalar_type(),
         "splatting_forward_cpu",
         [&] {
-            return splatting_forward_cpu_impl<scalar_t>(frame, flow, output);
+            splatting_forward_cpu_impl<scalar_t>(frame, flow, output);
         }
     );
 }
@@ -161,7 +161,7 @@ void splatting_backward(
         frame.scalar_type(),
         "splatting_backward_cpu",
         [&] {
-            return splatting_backward_cpu_impl<scalar_t>(frame, flow, grad_output, grad_frame, grad_flow);
+            splatting_backward_cpu_impl<scalar_t>(frame, flow, grad_output, grad_frame, grad_flow);
         }
     );
 }
