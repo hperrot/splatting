@@ -100,3 +100,9 @@ def test_dispatch_fail_and_not_fail():
     dispatch_fail(torch.float16)
     dispatch_not_fail(torch.float32)
     dispatch_not_fail(torch.float64)
+
+def test_not_quadratic():
+    frame = torch.ones(1, 3, 4, 5)
+    flow = torch.zeros(1, 2, 4, 5)
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    assert(torch.equal(output, frame))
