@@ -11,8 +11,6 @@ class SplattingFunction(torch.autograd.Function):
         assert(frame.size()[2] == flow.size()[2])
         assert(frame.size()[3] == flow.size()[3])
         assert(flow.size()[1] == 2)
-        assert(frame.is_contiguous())
-        assert(flow.is_contiguous())
         ctx.save_for_backward(frame, flow)
         output = splatting_cpp.splatting_forward(frame, flow)
         return output

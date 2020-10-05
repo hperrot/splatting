@@ -106,3 +106,25 @@ def test_not_quadratic():
     flow = torch.zeros(1, 2, 4, 5)
     output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
     assert(torch.equal(output, frame))
+
+def test_direction_2_not_contiguous():
+    frame = torch.zeros(1, 1, 3, 3).permute(0, 1, 3, 2)
+    assert(not frame.is_contiguous())
+    frame[0, :, 0, 0] = 1
+    flow = torch.zeros(1, 2, 3, 3)
+    flow[0, 1, 0, 0] = 1
+    target = torch.zeros(1, 1, 3, 3)
+    target[0, :, 1, 0] = 1
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    assert(torch.equal(output, target))
+
+def test_direction_3_not_contiguous():
+    frame = torch.zeros(1, 1, 3, 3).permute(0, 1, 3, 2)
+    assert(not frame.is_contiguous())
+    frame[0, :, 0, 0] = 1
+    flow = torch.zeros(1, 2, 3, 3)
+    flow[0, 0, 0, 0] = 1
+    target = torch.zeros(1, 1, 3, 3)
+    target[0, :, 0, 1] = 1
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    assert(torch.equal(output, target))
