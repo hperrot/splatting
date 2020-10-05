@@ -7,6 +7,7 @@ class SplattingFunction(torch.autograd.Function):
 
     @staticmethod
     def forward(ctx, frame, flow):
+        assert(frame.dtype == flow.dtype)
         assert(len(frame.size()) == 4)
         assert(len(flow.size()) == 4)
         assert(frame.size()[0] == flow.size()[0])

@@ -130,6 +130,12 @@ def test_direction_3_not_contiguous():
     assert(torch.equal(output, target))
 
 def test_wrong_dimensions():
+    # frame.dtype != flow.dtype
+    frame = torch.zeros(1, 1, 3, 3, dtype=torch.float32)
+    flow = torch.zeros(1, 2, 3, 3, dtype=torch.float64)
+    with pytest.raises(AssertionError):
+        output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+
     # len(frame.size()) != 4
     frame = torch.zeros(1)
     flow = torch.zeros(1, 2, 3, 3)
@@ -165,4 +171,3 @@ def test_wrong_dimensions():
     flow = torch.zeros(1, 1, 3, 3)
     with pytest.raises(AssertionError):
         output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
-    
