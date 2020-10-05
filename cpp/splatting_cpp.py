@@ -15,13 +15,16 @@ class SplattingFunction(torch.autograd.Function):
         assert(frame.size()[3] == flow.size()[3])
         assert(flow.size()[1] == 2)
         ctx.save_for_backward(frame, flow)
-        output = splatting_cpp.splatting_forward(frame, flow)
+        output = torch.zeros_like(frame)
+        splatting_cpp.splatting_forward(frame, flow, output)
         return output
 
     @staticmethod
     def backward(ctx, grad_output):
         frame, flow = ctx.saved_tensors
-        grad_frame, grad_flow = splatting_cpp.splatting_backward(frame, flow, grad_output)
+        grad_frame = torch.zeros_like(frame)
+        grad_flow = torch.zeros_like(flow)
+        splatting_cpp.splatting_backward(frame, flow, grad_output, grad_frame, grad_flow)
         return grad_frame, grad_flow
 
 

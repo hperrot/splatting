@@ -1,15 +1,13 @@
 #include <torch/extension.h>
-#include <vector>
 #include <cmath>
 
 
 template<typename scalar_t>
-torch::Tensor splatting_forward_cpu_impl(
+void splatting_forward_cpu_impl(
     const torch::Tensor frame,
-    const torch::Tensor flow
+    const torch::Tensor flow,
+    torch::Tensor output
 ) {
-    torch::Tensor output = torch::zeros_like(frame);
-
     const auto frame_a = frame.accessor<scalar_t, 4>();
     const auto flow_a = flow.accessor<scalar_t, 4>();
     auto output_a = output.accessor<scalar_t, 4>();
@@ -58,20 +56,17 @@ torch::Tensor splatting_forward_cpu_impl(
             }
         }
     }
-
-    return output;
 }
 
 
 template<typename scalar_t>
-std::vector<torch::Tensor> splatting_backward_cpu_impl(
+void splatting_backward_cpu_impl(
     const torch::Tensor frame,
     const torch::Tensor flow,
-    const torch::Tensor grad_output
+    const torch::Tensor grad_output,
+    torch::Tensor grad_frame,
+    torch::Tensor grad_flow
 ) {
-    torch::Tensor grad_frame = torch::zeros_like(frame);
-    torch::Tensor grad_flow = torch::zeros_like(flow);
-
     const auto frame_a = frame.accessor<scalar_t, 4>();
     const auto flow_a = flow.accessor<scalar_t, 4>();
     const auto grad_output_a = grad_output.accessor<scalar_t, 4>();
@@ -197,35 +192,36 @@ std::vector<torch::Tensor> splatting_backward_cpu_impl(
             }
         }
     }
-
-    return {grad_frame, grad_flow};
 }
 
 
-torch::Tensor splatting_forward(
+void splatting_forward(
     const torch::Tensor frame,
-    const torch::Tensor flow
+    const torch::Tensor flow,
+    torch::Tensor output
 ) {
-    return AT_DISPATCH_FLOATING_TYPES_AND_HALF(
+    AT_DISPATCH_FLOATING_TYPES_AND_HALF(
         frame.scalar_type(),
         "splatting_forward_cpu",
         [&] {
-            return splatting_forward_cpu_impl<scalar_t>(frame, flow);
+            return splatting_forward_cpu_impl<scalar_t>(frame, flow, output);
         }
     );
 }
 
 
-std::vector<torch::Tensor> splatting_backward(
+void splatting_backward(
     const torch::Tensor frame,
     const torch::Tensor flow,
-    const torch::Tensor grad_output
+    const torch::Tensor grad_output,
+    torch::Tensor grad_frame,
+    torch::Tensor grad_flow
 ) {
-    return AT_DISPATCH_FLOATING_TYPES_AND_HALF(
+    AT_DISPATCH_FLOATING_TYPES_AND_HALF(
         frame.scalar_type(),
         "splatting_backward_cpu",
         [&] {
-            return splatting_backward_cpu_impl<scalar_t>(frame, flow, grad_output);
+            return splatting_backward_cpu_impl<scalar_t>(frame, flow, grad_output, grad_frame, grad_flow);
         }
     );
 }
