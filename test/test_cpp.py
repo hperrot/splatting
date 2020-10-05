@@ -82,13 +82,13 @@ def test_out_of_bounds():
 
 def dispatch_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
-    flow = torch.zeros(1, 1, 3, 3, dtype=dtype)
+    flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     with pytest.raises(RuntimeError):
         output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
 
 def dispatch_not_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
-    flow = torch.zeros(1, 1, 3, 3, dtype=dtype)
+    flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
 
 def test_dispatch_fail_and_not_fail():
