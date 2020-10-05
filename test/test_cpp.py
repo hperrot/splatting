@@ -97,7 +97,7 @@ def test_dispatch_fail_and_not_fail():
     dispatch_fail(torch.int16)
     dispatch_fail(torch.int32)
     dispatch_fail(torch.int64)
-    dispatch_fail(torch.float16)
+    dispatch_not_fail(torch.float16)
     dispatch_not_fail(torch.float32)
     dispatch_not_fail(torch.float64)
 

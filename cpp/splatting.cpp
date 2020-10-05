@@ -66,7 +66,7 @@ torch::Tensor splatting_forward(
     const torch::Tensor frame,
     const torch::Tensor flow
 ) {
-    return AT_DISPATCH_FLOATING_TYPES(
+    return AT_DISPATCH_FLOATING_TYPES_AND_HALF(
         frame.scalar_type(),
         "splatting_forward_cpu",
         [&] {
