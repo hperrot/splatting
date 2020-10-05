@@ -192,3 +192,47 @@ def test_backward_produces_grads():
     flow.requires_grad_(True)
     output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
     output.sum().backward()
+
+def test_grads():
+    # zero flow
+    frame = torch.ones(1, 1, 3, 3, requires_grad=True)
+    flow = torch.zeros(1, 2, 3, 3)
+    flow.requires_grad_(True)
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output.sum().backward()
+    grad_frame_target = torch.ones(1, 1, 3, 3)
+    grad_flow_target = torch.zeros(1, 2, 3, 3)
+    grad_flow_target[:, 0, :, -1] = -1
+    grad_flow_target[:, 1, -1, :] = -1
+    assert(torch.allclose(frame.grad, grad_frame_target))
+    assert(torch.allclose(flow.grad, grad_flow_target))
+
+    # flow ones 0
+    frame = torch.ones(1, 1, 3, 3, requires_grad=True)
+    flow = torch.zeros(1, 2, 3, 3)
+    flow[0, 0, :, :] = 1
+    flow.requires_grad_(True)
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output.sum().backward()
+    grad_frame_target = torch.ones(1, 1, 3, 3)
+    grad_frame_target[:, :, :, -1] = 0
+    grad_flow_target = torch.zeros(1, 2, 3, 3)
+    grad_flow_target[:, 0, :, -2] = -1
+    grad_flow_target[:, 1, -1, :-1] = -1
+    assert(torch.allclose(frame.grad, grad_frame_target))
+    assert(torch.allclose(flow.grad, grad_flow_target))
+
+    # flow ones 1
+    frame = torch.ones(1, 1, 3, 3, requires_grad=True)
+    flow = torch.zeros(1, 2, 3, 3)
+    flow[0, 1, :, :] = 1
+    flow.requires_grad_(True)
+    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output.sum().backward()
+    grad_frame_target = torch.ones(1, 1, 3, 3)
+    grad_frame_target[:, :, -1, :] = 0
+    grad_flow_target = torch.zeros(1, 2, 3, 3)
+    grad_flow_target[:, 0, :-1, -1] = -1
+    grad_flow_target[:, 1, -2, :] = -1
+    assert(torch.allclose(frame.grad, grad_frame_target))
+    assert(torch.allclose(flow.grad, grad_flow_target))
