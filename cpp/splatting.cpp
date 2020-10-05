@@ -39,16 +39,16 @@ torch::Tensor splatting_forward_cpu_impl(
                     const auto southwest = ((float) (northeastX) - outputX   ) * (outputY    - (float) (northeastY));
                     const auto southeast = (outputX    - (float) (northwestX)) * (outputY    - (float) (northwestY));
 
-                    if ((northwestX >= 0) & (northwestX < output.size(3)) & (northwestY >= 0) & (northwestY < output.size(2))) {
+                    if ((northwestX >= 0) && (northwestX < output.size(3)) && (northwestY >= 0) && (northwestY < output.size(2))) {
                         output_a[N][C][northwestY][northwestX] += northwest * frame_a[N][C][Y][X];
                     }
-                    if ((northeastX >= 0) & (northeastX < output.size(3)) & (northeastY >= 0) & (northeastY < output.size(2))) {
+                    if ((northeastX >= 0) && (northeastX < output.size(3)) && (northeastY >= 0) && (northeastY < output.size(2))) {
                         output_a[N][C][northeastY][northeastX] += northeast * frame_a[N][C][Y][X];
                     }
-                    if ((southwestX >= 0) & (southwestX < output.size(3)) & (southwestY >= 0) & (southwestY < output.size(2))) {
+                    if ((southwestX >= 0) && (southwestX < output.size(3)) && (southwestY >= 0) && (southwestY < output.size(2))) {
                         output_a[N][C][southwestY][southwestX] += southwest * frame_a[N][C][Y][X];
                     }
-                    if ((southeastX >= 0) & (southeastX < output.size(3)) & (southeastY >= 0) & (southeastY < output.size(2))) {
+                    if ((southeastX >= 0) && (southeastX < output.size(3)) && (southeastY >= 0) && (southeastY < output.size(2))) {
                         output_a[N][C][southeastY][southeastX] += southeast * frame_a[N][C][Y][X];
                     }
                 }
