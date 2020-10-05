@@ -10,8 +10,8 @@ torch::Tensor splatting_forward_cpu_impl(
 ) {
     torch::Tensor output = torch::zeros_like(frame);
 
-    auto frame_a = frame.accessor<scalar_t, 4>();
-    auto flow_a = flow.accessor<scalar_t, 4>();
+    const auto frame_a = frame.accessor<scalar_t, 4>();
+    const auto flow_a = flow.accessor<scalar_t, 4>();
     auto output_a = output.accessor<scalar_t, 4>();
 
     const auto N = frame.size(0);
@@ -35,7 +35,7 @@ torch::Tensor splatting_forward_cpu_impl(
                     const auto southwestY = northwestY + 1;
                     const auto southeastX = northwestX + 1;
                     const auto southeastY = northwestY + 1;
-    
+
                     const auto northwest = ((float) (southeastX) - outputX   ) * ((float) (southeastY) - outputY   );
                     const auto northeast = (outputX    - (float) (southwestX)) * ((float) (southwestY) - outputY   );
                     const auto southwest = ((float) (northeastX) - outputX   ) * (outputY    - (float) (northeastY));
