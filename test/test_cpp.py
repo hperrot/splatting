@@ -1,12 +1,14 @@
 import torch
 import cpp.splatting_cpp
+import splatting_cpp
 import pytest
 
 
 def test_zero_flow():
     frame = torch.ones(1, 3, 2, 2)
     flow = torch.zeros(1, 2, 2, 2)
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, frame))
 
 def test_flow_one():
@@ -16,7 +18,8 @@ def test_flow_one():
     flow[0, :, 0, 0] = 1
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 1, 1] = 1
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_two_values_one_target_location():
@@ -27,7 +30,8 @@ def test_two_values_one_target_location():
     flow[0, :, 0, 0] = 1
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 1, 1] = 2
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_direction_2():
@@ -37,7 +41,8 @@ def test_direction_2():
     flow[0, 1, 0, 0] = 1
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 1, 0] = 1
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_direction_3():
@@ -47,7 +52,8 @@ def test_direction_3():
     flow[0, 0, 0, 0] = 1
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 0, 1] = 1
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_center():
@@ -57,7 +63,8 @@ def test_center():
     flow[0, :, 0, 0] = 0.5
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, :2, :2] = 0.25
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_partial():
@@ -68,7 +75,8 @@ def test_partial():
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 0, 0] = 0.8
     target[0, :, 1, 0] = 0.2
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_out_of_bounds():
@@ -77,7 +85,8 @@ def test_out_of_bounds():
     flow = torch.zeros(1, 2, 3, 3)
     flow[0, :, 0, 0] = 10
     target = torch.zeros(1, 1, 3, 3)
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def dispatch_fail(dtype):
@@ -89,7 +98,8 @@ def dispatch_fail(dtype):
 def dispatch_not_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
 
 def test_dispatch_fail_and_not_fail():
     dispatch_fail(torch.int)
@@ -104,7 +114,8 @@ def test_dispatch_fail_and_not_fail():
 def test_not_quadratic():
     frame = torch.ones(1, 3, 4, 5)
     flow = torch.zeros(1, 2, 4, 5)
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, frame))
 
 def test_direction_2_not_contiguous():
@@ -115,7 +126,8 @@ def test_direction_2_not_contiguous():
     flow[0, 1, 0, 0] = 1
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 1, 0] = 1
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_direction_3_not_contiguous():
@@ -126,7 +138,8 @@ def test_direction_3_not_contiguous():
     flow[0, 0, 0, 0] = 1
     target = torch.zeros(1, 1, 3, 3)
     target[0, :, 0, 1] = 1
-    output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
+    output = torch.zeros_like(frame)
+    splatting_cpp.splatting_forward(frame, flow, output)
     assert(torch.equal(output, target))
 
 def test_wrong_dimensions():
