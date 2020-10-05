@@ -174,8 +174,8 @@ def test_wrong_dimensions():
 
 def test_backward_produces_grads():
     frame = torch.ones(1, 1, 3, 3, requires_grad=True)
-    _flow = torch.zeros(1, 2, 3, 3)
-    _flow[0, :, 0, 0] = 0.1
-    flow = torch.tensor(_flow, requires_grad=True)
+    flow = torch.zeros(1, 2, 3, 3)
+    flow[0, :, 0, 0] = 0.1
+    flow.requires_grad_(True)
     output = cpp.splatting_cpp.SplattingFunction.apply(frame, flow)
     output.sum().backward()
