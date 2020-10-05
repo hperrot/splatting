@@ -100,35 +100,32 @@ void splatting_backward_cpu_impl(
                     const auto southwest = ((float) (northeastX) - outputX   ) * (outputY    - (float) (northeastY));
                     const auto southeast = (outputX    - (float) (northwestX)) * (outputY    - (float) (northwestY));
 
-                    scalar_t grad_frame_here = 0.0;
                     const scalar_t frame_here = frame_a[n][c][y][x];
 
                     if ((northwestX >= 0) && (northwestX < X) && (northwestY >= 0) && (northwestY < Y)) {
                         const scalar_t grad_output_here = grad_output_a[n][c][northwestY][northwestX];
-                        grad_frame_here += northwest * grad_output_here;
+                        grad_frame_a[n][c][y][x] += northwest * grad_output_here;
                         grad_flow_a[n][0][y][x] += frame_here * grad_output_here * ((float) (-1.0)) * ((float) (southeastY) - outputY   );
                         grad_flow_a[n][1][y][x] += frame_here * grad_output_here * ((float) (southeastX) - outputX   ) * ((float) (-1.0));
                     }
                     if ((northeastX >= 0) && (northeastX < X) && (northeastY >= 0) && (northeastY < Y)) {
                         const scalar_t grad_output_here = grad_output_a[n][c][northeastY][northeastX];
-                        grad_frame_here += northeast * grad_output_here;
+                        grad_frame_a[n][c][y][x] += northeast * grad_output_here;
                         grad_flow_a[n][0][y][x] += frame_here * grad_output_here * ((float) (+1.0)) * ((float) (southwestY) - outputY   );
                         grad_flow_a[n][1][y][x] += frame_here * grad_output_here * (outputX    - (float) (southwestX)) * ((float) (-1.0));
                     }
                     if ((southwestX >= 0) && (southwestX < X) && (southwestY >= 0) && (southwestY < Y)) {
                         const scalar_t grad_output_here = grad_output_a[n][c][southwestY][southwestX];
-                        grad_frame_here += southwest * grad_output_here;
+                        grad_frame_a[n][c][y][x] += southwest * grad_output_here;
                         grad_flow_a[n][0][y][x] += frame_here * grad_output_here * ((float) (-1.0)) * (outputY    - (float) (northeastY));
                         grad_flow_a[n][1][y][x] += frame_here * grad_output_here * ((float) (northeastX) - outputX   ) * ((float) (+1.0));
                     }
                     if ((southeastX >= 0) && (southeastX < X) && (southeastY >= 0) && (southeastY < Y)) {
                         const scalar_t grad_output_here = grad_output_a[n][c][southeastY][southeastX];
-                        grad_frame_here += southeast * grad_output_here;
+                        grad_frame_a[n][c][y][x] += southeast * grad_output_here;
                         grad_flow_a[n][0][y][x] += frame_here * grad_output_here * ((float) (+1.0)) * (outputY    - (float) (northwestY));
                         grad_flow_a[n][1][y][x] += frame_here * grad_output_here * (outputX    - (float) (northwestX)) * ((float) (+1.0));
                     }
-
-                    grad_frame_a[n][c][y][x] = grad_frame_here;
 
                 }
             }
