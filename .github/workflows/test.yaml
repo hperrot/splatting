@@ -3,7 +3,7 @@ name: Python test
 on: [push]
 
 jobs:
-  python-test:
+  python-jit:
 
     runs-on: ubuntu-latest
 
@@ -23,6 +23,21 @@ jobs:
     - name: Benchmark function with JIT compiler
       run: |
         python test/benchmark.py splatting_function
+
+  python-cpp:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install package and dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
     - name: Build cpp extension
       run: |
         pip install -e .
