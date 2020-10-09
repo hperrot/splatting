@@ -1,6 +1,15 @@
 import torch
 
-import splatting_cpp
+try:
+    import splatting_cpp
+except ImportError:
+    # try JIT-compilation with ninja
+    from torch.utils.cpp_extension import load
+    splatting_cpp = load(
+        name='splatting_cpp',
+        sources=['cpp/splatting.cpp'],
+        verbose=True,
+    )
 
 
 class SplattingFunction(torch.autograd.Function):

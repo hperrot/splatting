@@ -17,15 +17,27 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Build package
+    - name: Install ninja for JIT compiler
       run: |
-        pip install -e .
-    - name: Install build dependencies
+        pip install ninja
+    - name: Benchmark function with JIT compiler
       run: |
-        pip install -e '.[test]'
+        python test/benchmark.py splatting_function
+    - name: Build cpp extension
+      run: |
+        pip install -e
+    - name: Install pytest
+      run: |
+        pip install pytest
     - name: Test with pytest
       run: |
         python -m pytest test
-    - name: Benchmark
+    - name: Benchmark compiled cpp function
       run: |
-        python test/benchmark.py
+        python test/benchmark.py splatting_cpp
+    - name: Benchmark function
+      run: |
+        python test/benchmark.py splatting_function
+    - name: Benchmark module
+      run: |
+        python test/benchmark.py splatting_module        
