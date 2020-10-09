@@ -25,7 +25,7 @@ jobs:
         python test/benchmark.py splatting_function
     - name: Build cpp extension
       run: |
-        pip install -e
+        pip install -e .
     - name: Install pytest
       run: |
         pip install pytest
