@@ -83,7 +83,7 @@ jobs:
         python -m pip install pytest-cov
         python -m pip install ninja
 
-    - name: Test with pytest
+    - name: Test JIT compiled extension with pytest
       run: |
         python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_jit.xml
 
@@ -91,9 +91,14 @@ jobs:
       run: |
         python -m pip install -e .
 
-    - name: Test with pytest
+    - name: Test compiled extension with pytest
       run: |
         python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml
+
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: codecov/codecov-action@v1
       with:
