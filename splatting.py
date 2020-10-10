@@ -10,6 +10,7 @@ except ImportError:
         name='splatting_cpp',
         sources=['cpp/splatting.cpp'],
         verbose=True,
+        extra_cflags=['-O3'],
     )
 
 
