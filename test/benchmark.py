@@ -19,7 +19,7 @@ def run_test_forward(method, batch_size, spatial_size, flow_init, repetitions=10
         output = torch.zeros_like(frame)
 
         def test_fn():
-            splatting_cpp.splatting_forward(frame, flow, output)
+            splatting_cpp.splatting_forward_cpu(frame, flow, output)
 
     elif method == "splatting_function":
         import splatting

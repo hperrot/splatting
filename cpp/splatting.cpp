@@ -135,7 +135,7 @@ void splatting_backward_cpu_impl(
 }
 
 
-void splatting_forward(
+void splatting_forward_cpu(
     const torch::Tensor frame,
     const torch::Tensor flow,
     torch::Tensor output
@@ -150,7 +150,7 @@ void splatting_forward(
 }
 
 
-void splatting_backward(
+void splatting_backward_cpu(
     const torch::Tensor frame,
     const torch::Tensor flow,
     const torch::Tensor grad_output,
@@ -168,6 +168,6 @@ void splatting_backward(
 
 
 PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
-    m.def("splatting_forward", &splatting_forward, "splatting forward");
-    m.def("splatting_backward", &splatting_backward, "splatting backward");
+    m.def("splatting_forward_cpu", &splatting_forward_cpu, "splatting forward (CPU)");
+    m.def("splatting_backward_cpu", &splatting_backward_cpu, "splatting backward (CPU)");
 }

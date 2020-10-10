@@ -2,23 +2,45 @@ import torch
 from typing import Union
 
 try:
+    raise ImportError
     import splatting_cpp
+    if torch.cuda.is_available():
+        try:
+            import splatting_cuda
+        except ImportError:
+            pass
+
 except ImportError:
     # try JIT-compilation with ninja
     from torch.utils.cpp_extension import load
 
-    splatting_cpp = load(
-        name="splatting_cpp",
+    splatting_cpu = load(
+        name="splatting_cpu",
         sources=["cpp/splatting.cpp"],
         verbose=True,
         extra_cflags=["-O3"],
     )
+    if torch.cuda.is_available():
+        try:
+            import glob
+            import os
+
+            splatting_cuda = load(
+                name="splatting_cuda",
+                sources=["cuda/splatting_cuda.cpp", "cuda/splatting.cu"],
+                extra_include_paths=[os.path.dirname(glob.glob("/usr/local/**/cublas_v2.h", recursive=True)[0])],
+                verbose=True,
+                extra_cflags=["-O3"],
+            )
+        except:
+            pass
 
 
 class SummationSplattingFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, frame, flow):
         assert frame.dtype == flow.dtype
+        assert frame.device == flow.device
         assert len(frame.shape) == 4
         assert len(flow.shape) == 4
         assert frame.shape[0] == flow.shape[0]
@@ -27,7 +49,10 @@ class SummationSplattingFunction(torch.autograd.Function):
         assert flow.shape[1] == 2
         ctx.save_for_backward(frame, flow)
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward(frame, flow, output)
+        if frame.is_cuda:
+            splatting_cuda.splatting_forward_cuda(frame, flow, output)
+        else:
+            splatting_cpu.splatting_forward_cpu(frame, flow, output)
         return output
 
     @staticmethod
@@ -35,9 +60,14 @@ class SummationSplattingFunction(torch.autograd.Function):
         frame, flow = ctx.saved_tensors
         grad_frame = torch.zeros_like(frame)
         grad_flow = torch.zeros_like(flow)
-        splatting_cpp.splatting_backward(
-            frame, flow, grad_output, grad_frame, grad_flow
-        )
+        if frame.is_cuda:
+            splatting_cuda.splatting_backward_cuda(
+                frame, flow, grad_output, grad_frame, grad_flow
+            )
+        else:
+            splatting_cpu.splatting_backward_cpu(
+                frame, flow, grad_output, grad_frame, grad_flow
+            )
         return grad_frame, grad_flow
 
 
