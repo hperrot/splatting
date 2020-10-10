@@ -11,6 +11,7 @@ def dispatch_fail(dtype):
     with pytest.raises(RuntimeError):
         splatting_cpp.splatting_forward(frame, flow, output)
 
+
 def dispatch_not_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
@@ -18,13 +19,13 @@ def dispatch_not_fail(dtype):
     splatting_cpp.splatting_forward(frame, flow, output)
 
 
-class TestForward():
+class TestForward:
     def test_zero_flow(self):
         frame = torch.ones(1, 3, 2, 2)
         flow = torch.zeros(1, 2, 2, 2)
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, frame))
+        assert torch.equal(output, frame)
 
     def test_flow_one(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -35,7 +36,7 @@ class TestForward():
         target[0, :, 1, 1] = 1
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_two_values_one_target_location(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -47,7 +48,7 @@ class TestForward():
         target[0, :, 1, 1] = 2
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_direction_2(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -58,7 +59,7 @@ class TestForward():
         target[0, :, 1, 0] = 1
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_direction_3(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -69,7 +70,7 @@ class TestForward():
         target[0, :, 0, 1] = 1
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_center(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -80,7 +81,7 @@ class TestForward():
         target[0, :, :2, :2] = 0.25
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_partial(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -92,7 +93,7 @@ class TestForward():
         target[0, :, 1, 0] = 0.2
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_out_of_bounds(self):
         frame = torch.zeros(1, 1, 3, 3)
@@ -102,7 +103,7 @@ class TestForward():
         target = torch.zeros(1, 1, 3, 3)
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_dispatch_fail_and_not_fail(self):
         dispatch_fail(torch.int)
@@ -119,11 +120,11 @@ class TestForward():
         flow = torch.zeros(1, 2, 4, 5)
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, frame))
+        assert torch.equal(output, frame)
 
     def test_direction_2_not_contiguous(self):
         frame = torch.zeros(1, 1, 3, 3).permute(0, 1, 3, 2)
-        assert(not frame.is_contiguous())
+        assert not frame.is_contiguous()
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
         flow[0, 1, 0, 0] = 1
@@ -131,11 +132,11 @@ class TestForward():
         target[0, :, 1, 0] = 1
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
     def test_direction_3_not_contiguous(self):
         frame = torch.zeros(1, 1, 3, 3).permute(0, 1, 3, 2)
-        assert(not frame.is_contiguous())
+        assert not frame.is_contiguous()
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
         flow[0, 0, 0, 0] = 1
@@ -143,10 +144,10 @@ class TestForward():
         target[0, :, 0, 1] = 1
         output = torch.zeros_like(frame)
         splatting_cpp.splatting_forward(frame, flow, output)
-        assert(torch.equal(output, target))
+        assert torch.equal(output, target)
 
 
-class TestBackward():
+class TestBackward:
     def test_grads(self):
         # zero flow
         frame = torch.ones(1, 1, 3, 3, requires_grad=True)
@@ -158,8 +159,8 @@ class TestBackward():
         grad_flow_target = torch.zeros(1, 2, 3, 3)
         grad_flow_target[:, 0, :, -1] = -1
         grad_flow_target[:, 1, -1, :] = -1
-        assert(torch.allclose(frame.grad, grad_frame_target))
-        assert(torch.allclose(flow.grad, grad_flow_target))
+        assert torch.allclose(frame.grad, grad_frame_target)
+        assert torch.allclose(flow.grad, grad_flow_target)
 
         # flow ones 0
         frame = torch.ones(1, 1, 3, 3, requires_grad=True)
@@ -173,8 +174,8 @@ class TestBackward():
         grad_flow_target = torch.zeros(1, 2, 3, 3)
         grad_flow_target[:, 0, :, -2] = -1
         grad_flow_target[:, 1, -1, :-1] = -1
-        assert(torch.allclose(frame.grad, grad_frame_target))
-        assert(torch.allclose(flow.grad, grad_flow_target))
+        assert torch.allclose(frame.grad, grad_frame_target)
+        assert torch.allclose(flow.grad, grad_flow_target)
 
         # flow ones 1
         frame = torch.ones(1, 1, 3, 3, requires_grad=True)
@@ -188,5 +189,5 @@ class TestBackward():
         grad_flow_target = torch.zeros(1, 2, 3, 3)
         grad_flow_target[:, 0, :-1, -1] = -1
         grad_flow_target[:, 1, -2, :] = -1
-        assert(torch.allclose(frame.grad, grad_frame_target))
-        assert(torch.allclose(flow.grad, grad_flow_target))
+        assert torch.allclose(frame.grad, grad_frame_target)
+        assert torch.allclose(flow.grad, grad_flow_target)

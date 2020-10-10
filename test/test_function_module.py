@@ -9,59 +9,59 @@ class TestSummationSplattingFunction:
         # correct dtype
         frame = torch.zeros(1, 1, 3, 3, dtype=torch.float32)
         flow = torch.zeros(1, 2, 3, 3, dtype=torch.float32)
-        output = splatting.SummationSplattingFunction.apply(frame, flow)
+        splatting.SummationSplattingFunction.apply(frame, flow)
 
         # frame.dtype != flow.dtype
         frame = torch.zeros(1, 1, 3, 3, dtype=torch.float32)
         flow = torch.zeros(1, 2, 3, 3, dtype=torch.float64)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
     def test_wrong_dimensions(self):
         # correct shape
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(1, 2, 3, 3)
-        output = splatting.SummationSplattingFunction.apply(frame, flow)
+        splatting.SummationSplattingFunction.apply(frame, flow)
 
         # len(frame.size()) != 4
         frame = torch.zeros(1)
         flow = torch.zeros(1, 2, 3, 3)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
         # len(flow.size()) != 4
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(1)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
         # frame.size()[0] != flow.size()[0]
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(2, 2, 3, 3)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
         # frame.size()[2] != flow.size()[2]
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(1, 2, 2, 3)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
         # frame.size()[3] != flow.size()[3]
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(1, 2, 3, 2)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
         # flow.size()[1] != 2
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(1, 1, 3, 3)
         with pytest.raises(AssertionError):
-            output = splatting.SummationSplattingFunction.apply(frame, flow)
+            splatting.SummationSplattingFunction.apply(frame, flow)
 
 
-class Test_splatting_function():
-    def test_splatting_types(self):
+class Test_splatting_function:
+    def test_splatting_type_names(self):
         frame = torch.zeros(1, 1, 3, 3)
         flow = torch.zeros(1, 2, 3, 3)
         importance_metric = torch.ones_like(frame)
@@ -70,29 +70,35 @@ class Test_splatting_function():
         splatting.splatting_function("linear", frame, flow, importance_metric)
         splatting.splatting_function("softmax", frame, flow, importance_metric)
         with pytest.raises(NotImplementedError):
-            splatting.splatting_function("something_else", frame, flow, importance_metric)
+            splatting.splatting_function(
+                "something_else", frame, flow, importance_metric
+            )
 
-    def test_splatting_values(self):
+    def test_splatting_type_values(self):
         frame = torch.tensor([1, 2], dtype=torch.float32).reshape([1, 1, 1, 2])
         flow = torch.zeros([1, 2, 1, 2], dtype=torch.float32)
         flow[0, 0, 0, 0] = 1
-        importance_metric = torch.tensor([1, 2], dtype=torch.float32).reshape([1, 1, 1, 2])
+        importance_metric = torch.tensor([1, 2], dtype=torch.float32).reshape(
+            [1, 1, 1, 2]
+        )
 
-        #summation splatting
+        # summation splatting
         output = splatting.splatting_function("summation", frame, flow)
-        assert(output[0, 0, 0, 1] == pytest.approx(3))
+        assert output[0, 0, 0, 1] == pytest.approx(3)
 
         # average splatting
         output = splatting.splatting_function("average", frame, flow)
-        assert(output[0, 0, 0, 1] == pytest.approx(1.5))
+        assert output[0, 0, 0, 1] == pytest.approx(1.5)
 
         # linear splatting
         output = splatting.splatting_function("linear", frame, flow, importance_metric)
-        assert(output[0, 0, 0, 1] == pytest.approx(5./3.))
+        assert output[0, 0, 0, 1] == pytest.approx(5.0 / 3.0)
 
         # softmax splatting
         output = splatting.splatting_function("softmax", frame, flow, importance_metric)
-        assert(output[0, 0, 0, 1] == pytest.approx((exp(1) + 2 * exp(2))/(exp(1) + exp(2))))
+        assert output[0, 0, 0, 1] == pytest.approx(
+            (exp(1) + 2 * exp(2)) / (exp(1) + exp(2))
+        )
 
     def test_importance_metric_type_and_shape(self):
         frame = torch.ones([1, 1, 3, 3])
@@ -103,7 +109,7 @@ class Test_splatting_function():
         wrong_metric_2 = frame.new_ones([1, 1, 2, 3])
         wrong_metric_3 = frame.new_ones([1, 1, 3, 2])
 
-        #summation splatting
+        # summation splatting
         splatting.splatting_function("summation", frame, flow)
         with pytest.raises(AssertionError):
             splatting.splatting_function("summation", frame, flow, importance_metric)
@@ -140,7 +146,7 @@ class Test_splatting_function():
             splatting.splatting_function("softmax", frame, flow, wrong_metric_3)
 
 
-class TestSplatting():
+class TestSplatting:
     def test_splatting_types(self):
         splatting.Splatting("summation")
         splatting.Splatting("average")
