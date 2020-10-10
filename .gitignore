@@ -10,3 +10,8 @@ bin/*
 __pycache__
 *.so
 *.pyc
+
+# coverage
+.coverage
+cov_compiled.xml
+cov_jit.xml

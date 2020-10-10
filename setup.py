@@ -7,5 +7,7 @@ setup(
     ext_modules=[cpp_extension.CppExtension("splatting_cpp", ["cpp/splatting.cpp"])],
     cmdclass={"build_ext": cpp_extension.BuildExtension},
     install_requires=["torch"],
-    extras_require={"dev": ["pytest", "pre-commit"]},  # pip install -e '.[dev]'
+    extras_require={
+        "dev": ["pytest", "pytest-cov", "pre-commit"]
+    },  # pip install -e '.[dev]'
 )
