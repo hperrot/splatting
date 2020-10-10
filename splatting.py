@@ -48,7 +48,6 @@ def splatting_function(
     importance_metric :  Union[torch.Tensor, None] = None,
     eps : float = 1e-7,
 ) -> torch.Tensor:
-    assert(splatting_type in SPLATTING_TYPES)
     if splatting_type == "summation":
         assert(importance_metric is None)
     elif splatting_type == "average":
@@ -70,6 +69,8 @@ def splatting_function(
         assert(importance_metric.shape[3] == frame.shape[3])
         importance_metric = importance_metric.exp()
         frame = torch.cat([frame * importance_metric, importance_metric], 1)
+    else:
+        raise NotImplementedError("splatting_type has to be one of {}, not '{}'".format(SPLATTING_TYPES, splatting_type))
 
     output = SummationSplattingFunction.apply(frame, flow)
 
@@ -82,7 +83,8 @@ def splatting_function(
 class Splatting(torch.nn.Module):
     def __init__(self, splatting_type : str, eps : float=1e-7):
         super().__init__()
-        assert(splatting_type in SPLATTING_TYPES)
+        if splatting_type not in SPLATTING_TYPES:
+            raise NotImplementedError("splatting_type has to be one of {}, not '{}'".format(SPLATTING_TYPES, splatting_type))
         self.splatting_type = splatting_type
         self.eps = eps
 
