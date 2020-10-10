@@ -59,6 +59,16 @@ class TestSummationSplattingFunction:
         with pytest.raises(AssertionError):
             splatting.SummationSplattingFunction.apply(frame, flow)
 
+    def test_flow_one(self):
+        frame = torch.zeros(1, 1, 3, 3)
+        frame[0, :, 0, 0] = 1
+        flow = torch.zeros(1, 2, 3, 3)
+        flow[0, :, 0, 0] = 1
+        target = torch.zeros(1, 1, 3, 3)
+        target[0, :, 1, 1] = 1
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
+        assert torch.equal(output, target)
+
 
 class Test_splatting_function:
     def test_splatting_type_names(self):
@@ -145,6 +155,16 @@ class Test_splatting_function:
         with pytest.raises(AssertionError):
             splatting.splatting_function("softmax", frame, flow, wrong_metric_3)
 
+    def test_flow_one(self):
+        frame = torch.zeros(1, 1, 3, 3)
+        frame[0, :, 0, 0] = 1
+        flow = torch.zeros(1, 2, 3, 3)
+        flow[0, :, 0, 0] = 1
+        target = torch.zeros(1, 1, 3, 3)
+        target[0, :, 1, 1] = 1
+        output = splatting.splatting_function("summation", frame, flow)
+        assert torch.equal(output, target)
+
 
 class TestSplatting:
     def test_splatting_types(self):
@@ -154,3 +174,13 @@ class TestSplatting:
         splatting.Splatting("softmax")
         with pytest.raises(NotImplementedError):
             splatting.Splatting("something_else")
+
+    def test_flow_one(self):
+        frame = torch.zeros(1, 1, 3, 3)
+        frame[0, :, 0, 0] = 1
+        flow = torch.zeros(1, 2, 3, 3)
+        flow[0, :, 0, 0] = 1
+        target = torch.zeros(1, 1, 3, 3)
+        target[0, :, 1, 1] = 1
+        output = splatting.Splatting("summation")(frame, flow)
+        assert torch.equal(output, target)
