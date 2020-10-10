@@ -99,6 +99,8 @@ jobs:
     - name: Upload to Coveralls.io
       run: |
         coveralls
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: codecov/codecov-action@v1
       with:
