@@ -16,3 +16,6 @@ This impolementation requires [PyTorch](https://pytorch.org/get-started/locally/
          year = {2020}
      }
 ```
+
+## test status
+[![Coverage Status](https://coveralls.io/repos/github/hperrot/splatting/badge.svg)](https://coveralls.io/github/hperrot/splatting)
