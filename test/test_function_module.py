@@ -1,6 +1,7 @@
 import torch
 import splatting
 import pytest
+from numpy import exp
 
 
 class TestSummationSplattingFunction:
@@ -70,6 +71,73 @@ class Test_splatting_function():
         splatting.splatting_function("softmax", frame, flow, importance_metric)
         with pytest.raises(NotImplementedError):
             splatting.splatting_function("something_else", frame, flow, importance_metric)
+
+    def test_splatting_values(self):
+        frame = torch.tensor([1, 2], dtype=torch.float32).reshape([1, 1, 1, 2])
+        flow = torch.zeros([1, 2, 1, 2], dtype=torch.float32)
+        flow[0, 0, 0, 0] = 1
+        importance_metric = torch.tensor([1, 2], dtype=torch.float32).reshape([1, 1, 1, 2])
+
+        #summation splatting
+        output = splatting.splatting_function("summation", frame, flow)
+        assert(output[0, 0, 0, 1] == pytest.approx(3))
+
+        # average splatting
+        output = splatting.splatting_function("average", frame, flow)
+        assert(output[0, 0, 0, 1] == pytest.approx(1.5))
+
+        # linear splatting
+        output = splatting.splatting_function("linear", frame, flow, importance_metric)
+        assert(output[0, 0, 0, 1] == pytest.approx(5./3.))
+
+        # softmax splatting
+        output = splatting.splatting_function("softmax", frame, flow, importance_metric)
+        assert(output[0, 0, 0, 1] == pytest.approx((exp(1) + 2 * exp(2))/(exp(1) + exp(2))))
+
+    def test_importance_metric_type_and_shape(self):
+        frame = torch.ones([1, 1, 3, 3])
+        flow = torch.zeros([1, 2, 3, 3])
+        importance_metric = frame.new_ones([1, 1, 3, 3])
+        wrong_metric_0 = frame.new_ones([2, 1, 3, 3])
+        wrong_metric_1 = frame.new_ones([1, 2, 3, 3])
+        wrong_metric_2 = frame.new_ones([1, 1, 2, 3])
+        wrong_metric_3 = frame.new_ones([1, 1, 3, 2])
+
+        #summation splatting
+        splatting.splatting_function("summation", frame, flow)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("summation", frame, flow, importance_metric)
+
+        # average splatting
+        splatting.splatting_function("average", frame, flow)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("average", frame, flow, importance_metric)
+
+        # linear splatting
+        splatting.splatting_function("linear", frame, flow, importance_metric)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("linear", frame, flow)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("linear", frame, flow, wrong_metric_0)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("linear", frame, flow, wrong_metric_1)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("linear", frame, flow, wrong_metric_2)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("linear", frame, flow, wrong_metric_3)
+
+        # softmax splatting
+        splatting.splatting_function("softmax", frame, flow, importance_metric)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("softmax", frame, flow)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("softmax", frame, flow, wrong_metric_0)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("softmax", frame, flow, wrong_metric_1)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("softmax", frame, flow, wrong_metric_2)
+        with pytest.raises(AssertionError):
+            splatting.splatting_function("softmax", frame, flow, wrong_metric_3)
 
 
 class TestSplatting():
