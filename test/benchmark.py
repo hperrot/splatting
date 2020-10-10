@@ -19,12 +19,22 @@ def run_test_forward(method, batch_size, spatial_size, flow_init, repetitions=10
     elif method == "splatting_function":
         import splatting
         def test_fn():
-            splatting.SplattingFunction.apply(frame, flow)
-    elif method == "splatting_module":
+            splatting.SummationSplattingFunction.apply(frame, flow)
+    elif method == "splatting_function_summation":
         import splatting
-        splatting_module = splatting.Splatting()
+        def test_fn():
+            splatting.splatting_function("summation", frame, flow)
+    elif method == "splatting_module_summation":
+        import splatting
+        splatting_module = splatting.Splatting("summation")
         def test_fn():
             splatting_module(frame, flow)
+    elif method == "splatting_module_softmax":
+        import splatting
+        splatting_module = splatting.Splatting("softmax")
+        importance_metric = frame.new_ones([frame.shape[0], 1, frame.shape[2], frame.shape[3]])
+        def test_fn():
+            splatting_module(frame, flow, importance_metric)
     else:
         raise NotImplementedError
     ex_time = timeit.timeit(
@@ -53,15 +63,31 @@ def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=1
         import splatting
         frame.requires_grad_(True)
         flow.requires_grad_(True)
-        output = splatting.SplattingFunction.apply(frame, flow).sum()
+        output = splatting.SummationSplattingFunction.apply(frame, flow).sum()
         def test_fn():
             output.backward(retain_graph=True)
-    elif method == "splatting_module":
+    elif method == "splatting_function_summation":
         import splatting
         frame.requires_grad_(True)
         flow.requires_grad_(True)
-        splatting_module = splatting.Splatting()
+        output = splatting.splatting_function("summation", frame, flow).sum()
+        def test_fn():
+            output.backward(retain_graph=True)
+    elif method == "splatting_module_summation":
+        import splatting
+        frame.requires_grad_(True)
+        flow.requires_grad_(True)
+        splatting_module = splatting.Splatting("summation")
         output = splatting_module(frame, flow).sum()
+        def test_fn():
+            output.backward(retain_graph=True)
+    elif method == "splatting_module_softmax":
+        import splatting
+        frame.requires_grad_(True)
+        flow.requires_grad_(True)
+        importance_metric = frame.new_ones([frame.shape[0], 1, frame.shape[2], frame.shape[3]])
+        splatting_module = splatting.Splatting("softmax")
+        output = splatting_module(frame, flow, importance_metric).sum()
         def test_fn():
             output.backward(retain_graph=True)
     else:
@@ -85,7 +111,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Benchmark splatting implementation")
-    parser.add_argument('method', type=str, choices=['splatting_cpp', 'splatting_function', 'splatting_module'], help="What to benchmark")
+    parser.add_argument('method', type=str, choices=['splatting_cpp', 'splatting_function', 'splatting_function_summation', 'splatting_module_summation', 'splatting_module_softmax'], help="What to benchmark")
 
     args = parser.parse_args()
 

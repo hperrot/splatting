@@ -47,12 +47,18 @@ jobs:
     - name: Test with pytest
       run: |
         python -m pytest test
-    - name: Benchmark compiled cpp function
+    - name: Benchmark splatting_cpp.splatting_forward and splatting_cpp.splatting_backward
       run: |
         python test/benchmark.py splatting_cpp
-    - name: Benchmark function
+    - name: Benchmark splatting.SummationSplattingFunction
       run: |
         python test/benchmark.py splatting_function
-    - name: Benchmark module
+    - name: Benchmark splatting.splatting_function summation
       run: |
-        python test/benchmark.py splatting_module        
+        python test/benchmark.py splatting_function_summation
+    - name: Benchmark splatting.Splatting module summation
+      run: |
+        python test/benchmark.py splatting_module_summation
+    - name: Benchmark splatting.Splatting module softmax
+      run: |
+        python test/benchmark.py splatting_module_softmax

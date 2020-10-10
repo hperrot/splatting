@@ -93,7 +93,7 @@ def dispatch_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     with pytest.raises(RuntimeError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
 def dispatch_not_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
@@ -147,50 +147,50 @@ def test_wrong_dimensions():
     frame = torch.zeros(1, 1, 3, 3, dtype=torch.float32)
     flow = torch.zeros(1, 2, 3, 3, dtype=torch.float64)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
     # len(frame.size()) != 4
     frame = torch.zeros(1)
     flow = torch.zeros(1, 2, 3, 3)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
     # len(flow.size()) != 4
     frame = torch.zeros(1, 1, 3, 3)
     flow = torch.zeros(1)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
     # frame.size()[0] != flow.size()[0]
     frame = torch.zeros(1, 1, 3, 3)
     flow = torch.zeros(2, 2, 3, 3)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
     # frame.size()[2] != flow.size()[2]
     frame = torch.zeros(1, 1, 3, 3)
     flow = torch.zeros(1, 2, 2, 3)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
     # frame.size()[3] != flow.size()[3]
     frame = torch.zeros(1, 1, 3, 3)
     flow = torch.zeros(1, 2, 3, 2)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
     # flow.size()[1] != 2
     frame = torch.zeros(1, 1, 3, 3)
     flow = torch.zeros(1, 1, 3, 3)
     with pytest.raises(AssertionError):
-        output = splatting.SplattingFunction.apply(frame, flow)
+        output = splatting.SummationSplattingFunction.apply(frame, flow)
 
 def test_backward_produces_grads():
     frame = torch.ones(1, 1, 3, 3, requires_grad=True)
     flow = torch.zeros(1, 2, 3, 3)
     flow[0, :, 0, 0] = 0.1
     flow.requires_grad_(True)
-    output = splatting.SplattingFunction.apply(frame, flow)
+    output = splatting.SummationSplattingFunction.apply(frame, flow)
     output.sum().backward()
 
 def test_grads():
@@ -198,7 +198,7 @@ def test_grads():
     frame = torch.ones(1, 1, 3, 3, requires_grad=True)
     flow = torch.zeros(1, 2, 3, 3)
     flow.requires_grad_(True)
-    output = splatting.SplattingFunction.apply(frame, flow)
+    output = splatting.SummationSplattingFunction.apply(frame, flow)
     output.sum().backward()
     grad_frame_target = torch.ones(1, 1, 3, 3)
     grad_flow_target = torch.zeros(1, 2, 3, 3)
@@ -212,7 +212,7 @@ def test_grads():
     flow = torch.zeros(1, 2, 3, 3)
     flow[0, 0, :, :] = 1
     flow.requires_grad_(True)
-    output = splatting.SplattingFunction.apply(frame, flow)
+    output = splatting.SummationSplattingFunction.apply(frame, flow)
     output.sum().backward()
     grad_frame_target = torch.ones(1, 1, 3, 3)
     grad_frame_target[:, :, :, -1] = 0
@@ -227,7 +227,7 @@ def test_grads():
     flow = torch.zeros(1, 2, 3, 3)
     flow[0, 1, :, :] = 1
     flow.requires_grad_(True)
-    output = splatting.SplattingFunction.apply(frame, flow)
+    output = splatting.SummationSplattingFunction.apply(frame, flow)
     output.sum().backward()
     grad_frame_target = torch.ones(1, 1, 3, 3)
     grad_frame_target[:, :, -1, :] = 0
