@@ -28,9 +28,9 @@ jobs:
       run: |
         python -m pip install -e .
 
-    - name: Benchmark splatting_cpp.splatting_forward and splatting_cpp.splatting_backward
+    - name: Benchmark splatting.cpu.splatting_forward and splatting.cpu.splatting_backward
       run: |
-        python test/benchmark.py splatting_cpp
+        python test/benchmark.py splatting_cpu
     - name: Benchmark splatting.SummationSplattingFunction
       run: |
         python test/benchmark.py splatting_function
