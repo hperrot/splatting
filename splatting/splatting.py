@@ -20,6 +20,7 @@ try:
 except ImportError:
     # try JIT-compilation with ninja
     from torch.utils.cpp_extension import load
+
     try:
         import glob
         import os
@@ -27,13 +28,20 @@ except ImportError:
         splatting_cuda = load(
             name="splatting_cuda",
             sources=["cuda/splatting_cuda.cpp", "cuda/splatting.cu"],
-            extra_include_paths=[os.path.dirname(glob.glob("/usr/local/**/cublas_v2.h", recursive=True)[0])],
+            extra_include_paths=[
+                os.path.dirname(
+                    glob.glob("/usr/local/**/cublas_v2.h", recursive=True)[0]
+                )
+            ],
             verbose=True,
             extra_cflags=["-O3"],
         )
     except:
         import warnings
-        warnings.warn("splatting.cuda could not be imported nor jit compiled", ImportWarning)
+
+        warnings.warn(
+            "splatting.cuda could not be imported nor jit compiled", ImportWarning
+        )
         splatting_cuda = None
 
 

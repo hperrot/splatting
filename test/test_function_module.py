@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append(".")
 import torch
 import splatting
@@ -134,7 +135,6 @@ class TestSummationSplattingFunction:
         flow = torch.zeros(1, 2, 2, 2).cuda()
         output = splatting.SummationSplattingFunction.apply(frame, flow)
         assert torch.equal(output, frame)
-
 
     def test_two_values_one_target_location_cuda(self):
         if not torch.cuda.is_available():
