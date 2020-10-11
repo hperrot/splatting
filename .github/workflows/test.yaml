@@ -94,7 +94,7 @@ jobs:
 
     - name: Test compiled extension with pytest
       run: |
-        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml --cov-append
+        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml --cov-append --ignore=test/test_cuda.py
 
     - name: Upload to Coveralls.io
       run: |
