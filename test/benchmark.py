@@ -21,7 +21,7 @@ def run_test_forward(method, batch_size, spatial_size, flow_init, repetitions=10
         def test_fn():
             splatting.cpu.splatting_forward_cpu(frame, flow, output)
 
-    if method == "splatting_cuda":
+    elif method == "splatting_cuda":
         import splatting.cuda
 
         frame = frame.cuda()
@@ -64,7 +64,7 @@ def run_test_forward(method, batch_size, spatial_size, flow_init, repetitions=10
             splatting_module(frame, flow, importance_metric)
 
     else:
-        raise NotImplementedError
+        raise NotImplementedError(f"method {method}")
     ex_time = (
         timeit.timeit(
             test_fn,
@@ -98,7 +98,7 @@ def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=1
                 frame, flow, grad_output, grad_frame, grad_flow
             )
 
-    if method == "splatting_cuda":
+    elif method == "splatting_cuda":
         import splatting.cuda
 
         frame = frame.cuda()
@@ -159,7 +159,7 @@ def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=1
             output.backward(retain_graph=True)
 
     else:
-        raise NotImplementedError
+        raise NotImplementedError(f"method {method}")
     ex_time = (
         timeit.timeit(
             test_fn,
