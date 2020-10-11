@@ -86,7 +86,7 @@ jobs:
 
     - name: Test JIT compiled extension with pytest
       run: |
-        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_jit.xml
+        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_jit.xml --ignore=test/test_cpu.py --ignore=test/test_cuda.py
 
     - name: Build cpp extension
       run: |
