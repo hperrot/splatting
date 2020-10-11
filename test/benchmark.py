@@ -13,13 +13,24 @@ def run_test_forward(method, batch_size, spatial_size, flow_init, repetitions=10
         flow = torch.ones(batch_size, 2, spatial_size, spatial_size)
     else:
         raise NotImplementedError
-    if method == "splatting_cpp":
-        import splatting_cpp
+    if method == "splatting_cpu":
+        import splatting.cpu
 
         output = torch.zeros_like(frame)
 
         def test_fn():
-            splatting_cpp.splatting_forward_cpu(frame, flow, output)
+            splatting.cpu.splatting_forward_cpu(frame, flow, output)
+
+    if method == "splatting_cuda":
+        import splatting.cuda
+
+        frame = frame.cuda()
+        flow = flow.cuda()
+        output = torch.zeros_like(frame)
+
+        def test_fn():
+            splatting.cuda.splatting_forward_cuda(frame, flow, output)
+            torch.cuda.synchronize()
 
     elif method == "splatting_function":
         import splatting
@@ -61,7 +72,10 @@ def run_test_forward(method, batch_size, spatial_size, flow_init, repetitions=10
         )
         / repetitions
     )
-    print(f"forward \t{batch_size=}\t{spatial_size=}\t{flow_init=}\t{ex_time=}")
+    print(
+        f"forward \tbatch_size={batch_size}\tspatial_size={spatial_size}\t"
+        + f"flow_init={flow_init}\tex_time={ex_time}"
+    )
 
 
 def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=10):
@@ -72,17 +86,32 @@ def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=1
         flow = torch.ones(batch_size, 2, spatial_size, spatial_size)
     else:
         raise NotImplementedError
-    if method == "splatting_cpp":
-        import splatting_cpp
+    if method == "splatting_cpu":
+        import splatting.cpu
 
         grad_output = torch.zeros_like(frame)
         grad_frame = torch.zeros_like(frame)
         grad_flow = torch.zeros_like(flow)
 
         def test_fn():
-            splatting_cpp.splatting_backward(
+            splatting.cpu.splatting_backward_cpu(
                 frame, flow, grad_output, grad_frame, grad_flow
             )
+
+    if method == "splatting_cuda":
+        import splatting.cuda
+
+        frame = frame.cuda()
+        flow = flow.cuda()
+        grad_output = torch.zeros_like(frame)
+        grad_frame = torch.zeros_like(frame)
+        grad_flow = torch.zeros_like(flow)
+
+        def test_fn():
+            splatting.cuda.splatting_backward_cuda(
+                frame, flow, grad_output, grad_frame, grad_flow
+            )
+            torch.cuda.synchronize()
 
     elif method == "splatting_function":
         import splatting
@@ -138,7 +167,10 @@ def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=1
         )
         / repetitions
     )
-    print(f"backward\t{batch_size=}\t{spatial_size=}\t{flow_init=}\t{ex_time=}")
+    print(
+        f"forward \tbatch_size={batch_size}\tspatial_size={spatial_size}\t"
+        + f"flow_init={flow_init}\tex_time={ex_time}"
+    )
 
 
 def benchmark(method):
@@ -157,7 +189,8 @@ if __name__ == "__main__":
         "method",
         type=str,
         choices=[
-            "splatting_cpp",
+            "splatting_cpu",
+            "splatting_cuda",
             "splatting_function",
             "splatting_function_summation",
             "splatting_module_summation",
