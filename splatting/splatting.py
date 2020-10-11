@@ -1,15 +1,9 @@
+from shutil import Error
 import torch
 from typing import Union
 
 try:
-    raise ImportError
-    import splatting_cpp
-    if torch.cuda.is_available():
-        try:
-            import splatting_cuda
-        except ImportError:
-            pass
-
+    from splatting import cpu as splatting_cpu
 except ImportError:
     # try JIT-compilation with ninja
     from torch.utils.cpp_extension import load
@@ -20,20 +14,27 @@ except ImportError:
         verbose=True,
         extra_cflags=["-O3"],
     )
-    if torch.cuda.is_available():
-        try:
-            import glob
-            import os
 
-            splatting_cuda = load(
-                name="splatting_cuda",
-                sources=["cuda/splatting_cuda.cpp", "cuda/splatting.cu"],
-                extra_include_paths=[os.path.dirname(glob.glob("/usr/local/**/cublas_v2.h", recursive=True)[0])],
-                verbose=True,
-                extra_cflags=["-O3"],
-            )
-        except:
-            pass
+try:
+    from splatting import cuda as splatting_cuda
+except ImportError:
+    # try JIT-compilation with ninja
+    from torch.utils.cpp_extension import load
+    try:
+        import glob
+        import os
+
+        splatting_cuda = load(
+            name="splatting_cuda",
+            sources=["cuda/splatting_cuda.cpp", "cuda/splatting.cu"],
+            extra_include_paths=[os.path.dirname(glob.glob("/usr/local/**/cublas_v2.h", recursive=True)[0])],
+            verbose=True,
+            extra_cflags=["-O3"],
+        )
+    except:
+        import warnings
+        warnings.warn("splatting.cuda could not be imported nor jit compiled", ImportWarning)
+        splatting_cuda = None
 
 
 class SummationSplattingFunction(torch.autograd.Function):
@@ -50,7 +51,10 @@ class SummationSplattingFunction(torch.autograd.Function):
         ctx.save_for_backward(frame, flow)
         output = torch.zeros_like(frame)
         if frame.is_cuda:
-            splatting_cuda.splatting_forward_cuda(frame, flow, output)
+            if splatting_cuda is not None:
+                splatting_cuda.splatting_forward_cuda(frame, flow, output)
+            else:
+                raise RuntimeError("splatting.cuda is not available")
         else:
             splatting_cpu.splatting_forward_cpu(frame, flow, output)
         return output
@@ -61,9 +65,12 @@ class SummationSplattingFunction(torch.autograd.Function):
         grad_frame = torch.zeros_like(frame)
         grad_flow = torch.zeros_like(flow)
         if frame.is_cuda:
-            splatting_cuda.splatting_backward_cuda(
-                frame, flow, grad_output, grad_frame, grad_flow
-            )
+            if splatting_cuda is not None:
+                splatting_cuda.splatting_backward_cuda(
+                    frame, flow, grad_output, grad_frame, grad_flow
+                )
+            else:
+                raise RuntimeError("splatting.cuda is not available")
         else:
             splatting_cpu.splatting_backward_cpu(
                 frame, flow, grad_output, grad_frame, grad_flow

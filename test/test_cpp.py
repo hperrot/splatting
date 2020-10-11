@@ -2,7 +2,7 @@ import sys
 sys.path.append(".")
 import torch
 import splatting
-import splatting_cpp
+import splatting.cpu as splatting_cpu
 import pytest
 
 
@@ -11,14 +11,14 @@ def dispatch_fail(dtype):
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     output = torch.zeros_like(frame)
     with pytest.raises(RuntimeError):
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
 
 
 def dispatch_not_fail(dtype):
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     output = torch.zeros_like(frame)
-    splatting_cpp.splatting_forward_cpu(frame, flow, output)
+    splatting_cpu.splatting_forward_cpu(frame, flow, output)
 
 
 class TestForward:
@@ -26,7 +26,7 @@ class TestForward:
         frame = torch.ones(1, 3, 2, 2)
         flow = torch.zeros(1, 2, 2, 2)
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, frame)
 
     def test_flow_one(self):
@@ -37,7 +37,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 1, 1] = 1
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_flow_two(self):
@@ -48,7 +48,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 2, 2] = 1
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_two_values_one_target_location(self):
@@ -60,7 +60,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 1, 1] = 2
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_direction_2(self):
@@ -71,7 +71,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 1, 0] = 1
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_direction_3(self):
@@ -82,7 +82,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 0, 1] = 1
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_center(self):
@@ -93,7 +93,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, :2, :2] = 0.25
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_partial(self):
@@ -105,7 +105,7 @@ class TestForward:
         target[0, :, 0, 0] = 0.8
         target[0, :, 1, 0] = 0.2
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_out_of_bounds(self):
@@ -115,7 +115,7 @@ class TestForward:
         flow[0, :, 0, 0] = 10
         target = torch.zeros(1, 1, 3, 3)
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_dispatch_fail_and_not_fail(self):
@@ -132,7 +132,7 @@ class TestForward:
         frame = torch.ones(1, 3, 4, 5)
         flow = torch.zeros(1, 2, 4, 5)
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, frame)
 
     def test_direction_2_not_contiguous(self):
@@ -144,7 +144,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 1, 0] = 1
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
     def test_direction_3_not_contiguous(self):
@@ -156,7 +156,7 @@ class TestForward:
         target = torch.zeros(1, 1, 3, 3)
         target[0, :, 0, 1] = 1
         output = torch.zeros_like(frame)
-        splatting_cpp.splatting_forward_cpu(frame, flow, output)
+        splatting_cpu.splatting_forward_cpu(frame, flow, output)
         assert torch.equal(output, target)
 
 
