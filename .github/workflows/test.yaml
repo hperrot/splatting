@@ -20,6 +20,10 @@ jobs:
         python -m pip install -r requirements.txt
         python -m pip install ninja
 
+    - name: JIT compile extension
+      run: |
+        python -c "import splatting"
+
     - name: Benchmark JIT compiled splatting.SummationSplattingFunction 
       run: |
         python test/benchmark.py splatting_function
@@ -79,14 +83,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install -r requirements.txt
-        python -m pip install pytest
-        python -m pip install pytest-cov
-        python -m pip install ninja
-        python -m pip install coveralls
+        python -m pip install -r requirements_test.txt
+
+    - name: JIT compile extension
+      run: |
+        python -c "import splatting"
 
     - name: Test JIT compiled extension with pytest
       run: |
-        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_jit.xml
+        coverage run --parallel-mode -m pytest test -cov=./splatting --cov-config=.coveragerc --cov-report=xml:cov_jit.xml
 
     - name: Build cpp extension
       run: |
@@ -94,7 +99,10 @@ jobs:
 
     - name: Test compiled extension with pytest
       run: |
-        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml
+        coverage run --parallel-mode -m pytest test -cov=./splatting --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml
+    - name: Combine coverage
+      run: |
+        coverage combine
 
     - name: Upload to Coveralls.io
       run: |
