@@ -86,7 +86,7 @@ jobs:
 
     - name: Test JIT compiled extension with pytest
       run: |
-        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_jit.xml --ignore=test/test_cpu.py --ignore=test/test_cuda.py
+        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_jit.xml
 
     - name: Build cpp extension
       run: |
@@ -94,7 +94,7 @@ jobs:
 
     - name: Test compiled extension with pytest
       run: |
-        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml --cov-append --ignore=test/test_cuda.py
+        python -m pytest test --cov=./ --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml
 
     - name: Upload to Coveralls.io
       run: |

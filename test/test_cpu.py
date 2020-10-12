@@ -2,12 +2,18 @@ import sys
 
 sys.path.append(".")
 import torch
-import splatting
-import splatting.cpu as splatting_cpu
 import pytest
+import splatting
+
+try:
+    import splatting.cpu as splatting_cpu
+except ImportError:
+    splatting_cpu = None
 
 
 def dispatch_fail(dtype):
+    if splatting_cpu is None:
+        pytest.skip()
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     output = torch.zeros_like(frame)
@@ -16,6 +22,8 @@ def dispatch_fail(dtype):
 
 
 def dispatch_not_fail(dtype):
+    if splatting_cpu is None:
+        pytest.skip()
     frame = torch.zeros(1, 1, 3, 3, dtype=dtype)
     flow = torch.zeros(1, 2, 3, 3, dtype=dtype)
     output = torch.zeros_like(frame)
@@ -24,6 +32,8 @@ def dispatch_not_fail(dtype):
 
 class TestForward:
     def test_zero_flow(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.ones(1, 3, 2, 2)
         flow = torch.zeros(1, 2, 2, 2)
         output = torch.zeros_like(frame)
@@ -31,6 +41,8 @@ class TestForward:
         assert torch.equal(output, frame)
 
     def test_flow_one(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -42,6 +54,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_flow_two(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -53,6 +67,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_two_values_one_target_location(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         frame[0, :, 1, 1] = 1
@@ -65,6 +81,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_direction_2(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -76,6 +94,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_direction_3(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -87,6 +107,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_center(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -98,6 +120,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_partial(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -110,6 +134,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_out_of_bounds(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3)
         frame[0, :, 0, 0] = 1
         flow = torch.zeros(1, 2, 3, 3)
@@ -120,6 +146,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_dispatch_fail_and_not_fail(self):
+        if splatting_cpu is None:
+            pytest.skip()
         dispatch_fail(torch.int)
         dispatch_fail(torch.int8)
         dispatch_fail(torch.int16)
@@ -130,6 +158,8 @@ class TestForward:
         dispatch_not_fail(torch.float64)
 
     def test_not_quadratic(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.ones(1, 3, 4, 5)
         flow = torch.zeros(1, 2, 4, 5)
         output = torch.zeros_like(frame)
@@ -137,6 +167,8 @@ class TestForward:
         assert torch.equal(output, frame)
 
     def test_direction_2_not_contiguous(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3).permute(0, 1, 3, 2)
         assert not frame.is_contiguous()
         frame[0, :, 0, 0] = 1
@@ -149,6 +181,8 @@ class TestForward:
         assert torch.equal(output, target)
 
     def test_direction_3_not_contiguous(self):
+        if splatting_cpu is None:
+            pytest.skip()
         frame = torch.zeros(1, 1, 3, 3).permute(0, 1, 3, 2)
         assert not frame.is_contiguous()
         frame[0, :, 0, 0] = 1
@@ -163,6 +197,8 @@ class TestForward:
 
 class TestBackward:
     def test_grads(self):
+        if splatting_cpu is None:
+            pytest.skip()
         # zero flow
         frame = torch.ones(1, 1, 3, 3)
         flow = torch.zeros(1, 2, 3, 3)
