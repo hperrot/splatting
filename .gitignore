@@ -13,5 +13,4 @@ __pycache__
 
 # coverage
 .coverage
-cov_compiled.xml
-cov_jit.xml
+coverage.xml

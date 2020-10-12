@@ -24,7 +24,7 @@ jobs:
       run: |
         python -c "import splatting"
 
-    - name: Benchmark JIT compiled splatting.SummationSplattingFunction 
+    - name: Benchmark JIT compiled splatting.SummationSplattingFunction
       run: |
         python test/benchmark.py splatting_function
 
@@ -103,6 +103,7 @@ jobs:
     - name: Combine coverage
       run: |
         coverage combine
+        coverage xml
 
     - name: Upload to Coveralls.io
       run: |
@@ -113,5 +114,5 @@ jobs:
     - uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-        files: ./cov_jit.xml,./cov_compiled.xml # optional
+        file: ./coverage.xml # optional
         fail_ci_if_error: true # optional (default = false)
