@@ -91,7 +91,7 @@ jobs:
 
     - name: Test JIT compiled extension with pytest
       run: |
-        coverage run --parallel-mode -m pytest test -cov=./splatting --cov-config=.coveragerc --cov-report=xml:cov_jit.xml
+        coverage run --parallel-mode -m pytest test -cov=./splatting --cov-config=.coveragerc
 
     - name: Build cpp extension
       run: |
@@ -99,7 +99,7 @@ jobs:
 
     - name: Test compiled extension with pytest
       run: |
-        coverage run --parallel-mode -m pytest test -cov=./splatting --cov-config=.coveragerc --cov-report=xml:cov_compiled.xml
+        coverage run --parallel-mode -m pytest test -cov=./splatting --cov-config=.coveragerc
     - name: Combine coverage
       run: |
         coverage combine
