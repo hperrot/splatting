@@ -168,7 +168,7 @@ def run_test_backward(method, batch_size, spatial_size, flow_init, repetitions=1
         / repetitions
     )
     print(
-        f"forward \tbatch_size={batch_size}\tspatial_size={spatial_size}\t"
+        f"backward \tbatch_size={batch_size}\tspatial_size={spatial_size}\t"
         + f"flow_init={flow_init}\tex_time={ex_time}"
     )
 
