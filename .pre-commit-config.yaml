@@ -4,3 +4,8 @@ repos:
     hooks:
       - id: black
         language_version: python3 # Should be a command that runs python3.6+
+  - repo: git://github.com/doublify/pre-commit-clang-format
+    rev: master
+    hooks:
+    - id: clang-format
+      files: \.(c|cc|cxx|cpp|cu|cuh)$
