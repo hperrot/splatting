@@ -18,6 +18,46 @@ Then just import the module in your python script.
 The first time you import it, the extension will be compiled.
 The second time, it does not need to compile it anymore.
 
+## usage
+
+If you installed the extension with pip, you can simply import it:
+
+```
+from splatting import Splatting
+```
+
+If you choose to JIT compile it, you can add this repository to your project structure like
+
+```
+└── your_code
+    ├── file1.py
+    ├── file2.py
+    └── utils
+        └── splatting  // this repository
+```
+
+you can import like this:
+
+```
+from your_code.utils.splatting import Splatting
+```
+
+The splatting function can be used like this:
+
+```
+import torch
+from splatting import Splatting, splatting_function
+
+frame = torch.ones([1, 3, 4, 4])
+flow = torch.ones([1, 2, 4, 4])
+
+# use of the slatting function
+output = splatting_function("average", frame, flow)
+
+# use of the splatting module
+output = Splatting("average")(frame, flow)
+```
+
 ## references
 
 ```
