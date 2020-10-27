@@ -1,6 +1,9 @@
 from shutil import Error
 import torch
 from typing import Union
+import os
+
+splatting_dirname = os.path.dirname(os.path.dirname(__file__))
 
 try:
     from splatting import cpu as splatting_cpu
@@ -10,7 +13,7 @@ except ImportError:
 
     splatting_cpu = load(
         name="splatting_cpu",
-        sources=["cpp/splatting.cpp"],
+        sources=[os.path.join(splatting_dirname, "cpp/splatting.cpp")],
         verbose=True,
         extra_cflags=["-O3"],
     )
@@ -27,7 +30,10 @@ except ImportError:
 
         splatting_cuda = load(
             name="splatting_cuda",
-            sources=["cuda/splatting_cuda.cpp", "cuda/splatting.cu"],
+            sources=[
+                os.path.join(splatting_dirname, "cuda/splatting_cuda.cpp"),
+                os.path.join(splatting_dirname, "cuda/splatting.cu"),
+            ],
             extra_include_paths=[
                 os.path.dirname(
                     glob.glob("/usr/local/**/cublas_v2.h", recursive=True)[0]
